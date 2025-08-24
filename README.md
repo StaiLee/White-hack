@@ -1,2 +1,2 @@
 # White-hack
-projet memoire B3
+projet diplome B3
