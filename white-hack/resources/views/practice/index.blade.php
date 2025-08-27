@@ -1,30 +1,48 @@
+{{-- resources/views/practice/index.blade.php --}}
 <x-app-layout>
-  <div class="max-w-6xl mx-auto p-6">
+  <section class="wh-container py-8">
     <h1 class="text-2xl font-semibold mb-4">Pratique (Labs)</h1>
+
     @if (session('status'))
-      <div class="mb-4 px-4 py-2 rounded-lg bg-emerald-900/40 border border-emerald-700 text-emerald-200">
+      <div class="mb-4 rounded-xl border border-emerald-700 bg-emerald-900/40 px-4 py-2 text-emerald-200">
         {{ session('status') }}
       </div>
     @endif
 
     <div class="grid md:grid-cols-2 gap-6">
       @forelse($targets as $t)
-        <div class="rounded-2xl bg-slate-900/60 border border-slate-700 p-5">
+        <div class="wh-card">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold">{{ $t->name }}</h2>
-            <span class="text-xs px-2 py-1 rounded bg-slate-800 border border-slate-700">
-              {{ strtoupper($t->protocol) }} : {{ $t->host }}:{{ $t->port }}
-            </span>
+            <span class="wh-chip">{{ strtoupper($t->protocol) }} : {{ $t->host }}:{{ $t->port }}</span>
           </div>
-          <p class="text-slate-300 mt-2">{{ $t->description }}</p>
-          <form method="post" action="{{ route('labs.link',$t->id) }}" class="mt-4">
-            @csrf
-            <button class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500">Se connecter</button>
-          </form>
+
+          <p class="wh-muted mt-2">{{ $t->description }}</p>
+
+          <div class="mt-4 flex items-center gap-3">
+            {{-- Ouvre la prise de contrôle graphique dans un nouvel onglet --}}
+            <a href="http://192.168.230.140:6080/vnc.html?autoconnect=true&password=WhiteHack%212025&resize=scale&autofit=1"
+               target="_blank" rel="noopener"
+               class="wh-btn-primary">
+              Prendre le contrôle (GUI)
+            </a>
+
+            {{-- (Optionnel) laisse le bouton SSH si tu l'utilises encore --}}
+            @if(Route::has('labs.link'))
+              <form method="post" action="{{ route('labs.link', $t->id) }}">
+                @csrf
+                <button class="wh-btn-secondary">Se connecter (SSH)</button>
+              </form>
+            @endif
+          </div>
         </div>
       @empty
-        <div class="text-slate-400">Aucune target disponible pour l’instant.</div>
+        <div class="wh-muted">Aucune target disponible pour l’instant.</div>
       @endforelse
     </div>
-  </div>
+
+    <p class="mt-6 text-xs text-slate-500">
+      ⚠️ Accès restreint au réseau local. Utilisation pédagogique uniquement.
+    </p>
+  </section>
 </x-app-layout>
