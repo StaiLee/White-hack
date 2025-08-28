@@ -1,36 +1,85 @@
-{{-- Catalogue des cours --}}
+{{-- resources/views/courses/index.blade.php --}}
 <x-app-layout>
-  <section class="wh-container py-10">
-    <header class="mb-8">
-      <h1 class="text-3xl font-semibold">Catalogue des cours</h1>
-      <p class="wh-muted mt-1">Parcours structurés, labs balisés. Choisis et lance-toi.</p>
-      <form method="get" class="mt-6">
-        <div class="relative max-w-md">
-          <input type="search" name="q" value="{{ $q }}" placeholder="Rechercher un cours…"
-                 class="w-full rounded-2xl bg-slate-900/70 border border-slate-800 px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Entrée ↵</span>
-        </div>
-      </form>
-    </header>
+  @php
+    $active = request('level'); // '', 'easy', 'mid', 'hard'
+    $map = ['easy'=>'debutant','mid'=>'intermediaire','hard'=>'avance'];
 
-    <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-      @forelse($courses as $course)
-        <a href="{{ route('courses.show',$course->slug) }}"
-           class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-6 transition hover:border-slate-700 hover:bg-slate-900">
-          <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-emerald-500/10 blur-2xl"></div>
-          <div class="mb-2 inline-flex items-center gap-2">
-            <span class="wh-chip">{{ ucfirst($course->level) }}</span>
-            <span class="wh-chip">{{ $course->duration_min }} min</span>
+    // Stats pour les filtres
+    $countAll  = \App\Models\Course::where('is_published',true)->count();
+    $countEasy = \App\Models\Course::where('is_published',true)->where('level','debutant')->count();
+    $countMid  = \App\Models\Course::where('is_published',true)->where('level','intermediaire')->count();
+    $countHard = \App\Models\Course::where('is_published',true)->where('level','avance')->count();
+
+    // Liste des cours paginés (avec filtre si présent)
+    $courses = \App\Models\Course::where('is_published',true)
+      ->when($active, function($q) use($map,$active){
+        if(isset($map[$active])) $q->where('level', $map[$active]);
+      })
+      ->orderByDesc('created_at')
+      ->paginate(12)
+      ->withQueryString();
+  @endphp
+
+  <section class="wh-container">
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <p class="muted up mb-2">Catalogue</p>
+          <h1 class="rainbow-title animated-rainbow" style="font-size:2.4rem;margin:0">Tous les cours</h1>
+
+          <div class="filters mt-3">
+            <a class="btn-filter btn-rainbow {{ $active==='' ? 'is-active':'' }}" href="{{ route('courses.index') }}">
+              Tous <span class="count">{{ $countAll }}</span>
+            </a>
+            <a class="btn-filter chip-easy {{ $active==='easy' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'easy']) }}">
+              Facile <span class="count">{{ $countEasy }}</span>
+            </a>
+            <a class="btn-filter chip-medium {{ $active==='mid' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'mid']) }}">
+              Moyen <span class="count">{{ $countMid }}</span>
+            </a>
+            <a class="btn-filter chip-hard {{ $active==='hard' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'hard']) }}">
+              Difficile <span class="count">{{ $countHard }}</span>
+            </a>
           </div>
-          <h2 class="mt-1 text-xl font-semibold group-hover:underline">{{ $course->title }}</h2>
-          <p class="wh-muted mt-2 line-clamp-2">{{ $course->description }}</p>
-          <div class="mt-6 text-sm text-slate-400">Ouvrir le cours →</div>
-        </a>
-      @empty
-        <div class="wh-muted">Aucun cours publié.</div>
-      @endforelse
+        </div>
+
+        <form method="get" class="search-form">
+          <input class="inp" type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher un cours…">
+          @if($active) <input type="hidden" name="level" value="{{ $active }}"> @endif
+          <button class="btn-secondary">Rechercher</button>
+        </form>
+      </div>
     </div>
 
-    <div class="mt-8">{{ $courses->links() }}</div>
+    <div class="courses-grid mt-5">
+      @foreach($courses as $c)
+        <article class="course-card">
+          <div class="course-card__bg"></div>
+          <div class="course-card__hover"></div>
+
+          <div class="course-card__badge {{ $c->level==='debutant' ? 'chip-easy' : ($c->level==='intermediaire' ? 'chip-medium' : 'chip-hard') }}">
+            {{ ucfirst($c->level) }} • ~{{ $c->duration_min }} min
+          </div>
+
+          <h3 class="course-card__title
+            {{ $c->level==='debutant' ? 't-easy' : ($c->level==='intermediaire' ? 't-medium' : 't-hard') }}">
+            {{ $c->title }}
+          </h3>
+
+          <p class="course-card__desc">
+            {{ $c->description }}
+          </p>
+
+          <div class="course-card__footer">
+            <a href="{{ route('courses.show',$c->slug) }}" class="btn-primary">Ouvrir le cours →</a>
+          </div>
+        </article>
+      @endforeach
+    </div>
+
+    {{-- Pagination stylée --}}
+    <div class="pagination">
+      {{ $courses->onEachSide(1)->links() }}
+    </div>
   </section>
 </x-app-layout>

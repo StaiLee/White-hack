@@ -1,27 +1,25 @@
-<nav class="sticky top-0 z-50 backdrop-blur bg-slate-950/60 border-b border-slate-800">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex h-16 items-center justify-between">
-      <!-- Logo + Brand -->
-      <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-        <x-application-logo />
-        <span class="font-semibold tracking-wide">WhiteHack</span>
-      </a>
+{{-- resources/views/layouts/navigation.blade.php --}}
+<nav class="wh-nav">
+  <div class="wh-container nav-inner">
+    <a href="{{ route('dashboard') }}" class="brand">
+      <span class="logo-dot"></span>
+      <span class="brand-text">WhiteHack</span>
+    </a>
 
-      <!-- Links -->
-      <div class="hidden md:flex items-center gap-2">
-        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
-        <x-nav-link :href="route('courses.index')" :active="request()->routeIs('courses.*')">Cours</x-nav-link>
-        <x-nav-link :href="route('practice.index')" :active="request()->routeIs('practice.*')">Pratique</x-nav-link>
-      </div>
+    <ul class="nav-links">
+      <li><a href="{{ route('courses.index') }}">Cours</a></li>
+      <li><a href="{{ route('practice.index') }}">Pratique</a></li>
+    </ul>
 
-      <!-- Profil -->
-      <div class="flex items-center gap-3">
-        @auth
-          <a href="{{ route('profile.edit') }}" class="hidden sm:inline-block rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-sm hover:bg-slate-900">
-            Profil
-          </a>
-        @endauth
-      </div>
+    <div class="nav-actions">
+      @auth
+        <form method="POST" action="{{ route('logout') }}">@csrf
+          <button class="btn-secondary">Se déconnecter</button>
+        </form>
+      @else
+        <a class="btn-ghost" href="{{ route('login') }}">Login</a>
+        <a class="btn-primary" href="{{ route('register') }}">Register</a>
+      @endauth
     </div>
   </div>
 </nav>

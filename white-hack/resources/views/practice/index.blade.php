@@ -1,48 +1,39 @@
 {{-- resources/views/practice/index.blade.php --}}
 <x-app-layout>
-  <section class="wh-container py-8">
-    <h1 class="text-2xl font-semibold mb-4">Pratique (Labs)</h1>
-
-    @if (session('status'))
-      <div class="mb-4 rounded-xl border border-emerald-700 bg-emerald-900/40 px-4 py-2 text-emerald-200">
-        {{ session('status') }}
-      </div>
-    @endif
-
-    <div class="grid md:grid-cols-2 gap-6">
-      @forelse($targets as $t)
-        <div class="wh-card">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold">{{ $t->name }}</h2>
-            <span class="wh-chip">{{ strtoupper($t->protocol) }} : {{ $t->host }}:{{ $t->port }}</span>
-          </div>
-
-          <p class="wh-muted mt-2">{{ $t->description }}</p>
-
-          <div class="mt-4 flex items-center gap-3">
-            {{-- Ouvre la prise de contrôle graphique dans un nouvel onglet --}}
-            <a href="http://192.168.230.140:6080/vnc.html?autoconnect=true&password=WhiteHack%212025&resize=scale&autofit=1"
-               target="_blank" rel="noopener"
-               class="wh-btn-primary">
-              Prendre le contrôle (GUI)
-            </a>
-
-            {{-- (Optionnel) laisse le bouton SSH si tu l'utilises encore --}}
-            @if(Route::has('labs.link'))
-              <form method="post" action="{{ route('labs.link', $t->id) }}">
-                @csrf
-                <button class="wh-btn-secondary">Se connecter (SSH)</button>
-              </form>
-            @endif
-          </div>
-        </div>
-      @empty
-        <div class="wh-muted">Aucune target disponible pour l’instant.</div>
-      @endforelse
+  <section class="wh-container">
+    <div class="card hero">
+      <p class="muted up mb-2">Pratique</p>
+      <h1 class="hero-title">
+        <span class="rainbow-title animated-rainbow" style="font-size:2.0rem">Connexion & Labs</span>
+      </h1>
+      <p class="hero-sub">Lance une machine d'entraînement et expérimente en toute sécurité.</p>
     </div>
 
-    <p class="mt-6 text-xs text-slate-500">
-      ⚠️ Accès restreint au réseau local. Utilisation pédagogique uniquement.
-    </p>
+    <div class="grid-2 mt-5">
+      @forelse($targets as $t)
+        <article class="course-card">
+          <div class="course-card__bg"></div>
+          <div class="course-card__hover"></div>
+
+          <div class="course-card__badge chip-medium">
+            {{ strtoupper($t->protocol) }} • {{ $t->host }}:{{ $t->port }}
+          </div>
+
+          <h3 class="course-card__title t-medium">{{ $t->name }}</h3>
+          <p class="course-card__desc">{{ $t->description }}</p>
+
+          <div class="course-card__footer">
+            <a href="http://192.168.230.140:6080/vnc.html?autoconnect=true&password=WhiteHack%212025&resize=scale&autofit=1"
+               target="_blank" rel="noopener" class="btn-primary">
+              Connexion GUI (VM) →
+            </a>
+          </div>
+        </article>
+      @empty
+        <div class="wh-card">
+          <p class="muted">Aucune cible disponible pour le moment.</p>
+        </div>
+      @endforelse
+    </div>
   </section>
 </x-app-layout>
