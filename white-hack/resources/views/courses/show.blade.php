@@ -1,60 +1,51 @@
-@extends('layouts.app')
+{{-- resources/views/courses/show.blade.php --}}
+<x-app-layout>
+  @php
+    $chip = fn($lvl) => $lvl==='debutant' ? 'chip-easy' : ($lvl==='intermediaire' ? 'chip-medium' : 'chip-hard');
+    $tone = fn($lvl) => $lvl==='debutant' ? 't-easy' : ($lvl==='intermediaire' ? 't-medium' : 't-hard');
+    $filterParam = $course->level === 'debutant' ? 'easy' : ($course->level === 'intermediaire' ? 'mid' : 'hard');
+  @endphp
 
-@section('content')
-<section class="card">
-  <div class="section-head">
-    <div>
-      <p class="muted">Catalogue</p>
-      <h1 class="rainbow-title animated-rainbow">Tous les cours</h1>
+  <section class="wh-container">
+    <div class="card">
+      <p class="muted up mb-2">COURS</p>
+      <h1 class="course-card__title {{ $tone($course->level) }}" style="margin:0">
+        {{ $course->title }}
+      </h1>
+      <p class="muted" style="max-width:70ch;margin-top:.5rem">{{ $course->description }}</p>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:1rem">
+        <span class="btn-filter {{ $chip($course->level) }}">{{ ucfirst($course->level) }} • ~{{ $course->duration_min }} min</span>
+        <a class="btn-secondary" href="{{ route('courses.index',['level'=>$filterParam]) }}">→ Voir les cours {{ $course->level === 'debutant' ? 'faciles' : ($course->level === 'intermediaire' ? 'moyens' : 'difficiles') }}</a>
+      </div>
     </div>
-    <form method="get" class="search-form" action="{{ route('courses.index') }}">
-      <input class="inp" type="text" name="q" value="{{ $q ?? '' }}" placeholder="Rechercher un cours…">
-      <button class="btn-secondary" type="submit">Rechercher</button>
-    </form>
-  </div>
 
-  <div class="filters">
-    @php $level = request('level'); @endphp
-    <a class="btn-filter btn-rainbow {{ $level? '' : 'is-active' }}"
-       href="{{ route('courses.index',['q'=>$q]) }}">Tous
-       <span class="count">{{ ($total ?? null) ?: ($courses->total() ?? $courses->count()) }}</span>
-    </a>
-    <a class="btn-filter chip-easy chip-anim {{ $level==='debutant' ? 'is-active' : '' }}"
-       href="{{ route('courses.index',['level'=>'debutant','q'=>$q]) }}">Facile
-       <span class="count">{{ $counts['debutant'] ?? '' }}</span>
-    </a>
-    <a class="btn-filter chip-medium chip-anim {{ $level==='intermediaire' ? 'is-active' : '' }}"
-       href="{{ route('courses.index',['level'=>'intermediaire','q'=>$q]) }}">Moyen
-       <span class="count">{{ $counts['intermediaire'] ?? '' }}</span>
-    </a>
-    <a class="btn-filter chip-hard chip-anim {{ $level==='avance' ? 'is-active' : '' }}"
-       href="{{ route('courses.index',['level'=>'avance','q'=>$q]) }}">Difficile
-       <span class="count">{{ $counts['avance'] ?? '' }}</span>
-    </a>
-  </div>
-</section>
+    @if($course->modules->count())
+      <div class="grid-2 mt-4">
+        @foreach($course->modules as $module)
+          <article class="wh-card">
+            <p class="up muted" style="margin:0 0 .6rem"> {{ $module->title }} </p>
 
-<section class="grid-2 mt-4">
-  @forelse($courses as $c)
-    @php
-      $lvl = strtolower($c->level ?? 'debutant');
-      $tClass = $lvl === 'debutant' ? 't-easy' : ($lvl === 'intermediaire' ? 't-medium' : 't-hard');
-      $chip = $lvl === 'debutant' ? 'chip-easy' : ($lvl === 'intermediaire' ? 'chip-medium' : 'chip-hard');
-    @endphp
-    <article class="course-card">
-      <div class="course-card__bg"></div>
-      <span class="course-card__badge {{ $chip }} chip-anim">{{ ucfirst($lvl) }} • ~{{ $c->duration_min ?? 120 }} min</span>
-      <h3 class="course-card__title {{ $tClass }}">{{ $c->title }}</h3>
-      <p class="course-card__desc">{{ $c->description }}</p>
-      <div class="course-card__hover"></div>
-      <a href="{{ route('courses.show',$c->slug) }}" class="btn-ghost mt-2">Ouvrir le cours →</a>
-    </article>
-  @empty
-    <div class="wh-card">Aucun cours pour le moment.</div>
-  @endforelse
-</section>
+            @if($module->lessons->count())
+              <ul class="road-lessons">
+                @foreach($module->lessons as $lesson)
+                  <li>
+                    <a class="road-link" href="{{ route('lessons.show', ['lesson'=>$lesson->id]) }}">
+                      {{ $lesson->title }}
+                    </a>
+                  </li>
+                @endforeach
+              </ul>
+            @else
+              <p class="muted">Aucune leçon pour le moment.</p>
+            @endif
+          </article>
+        @endforeach
+      </div>
+    @endif
 
-<div class="mt-5">
-  {{ $courses->withQueryString()->links() }}
-</div>
-@endsection
+    <div class="mt-3">
+      <a class="btn-ghost" href="{{ route('courses.index') }}">← Tous les cours</a>
+    </div>
+  </section>
+</x-app-layout>

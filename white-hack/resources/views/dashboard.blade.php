@@ -1,16 +1,20 @@
 {{-- resources/views/dashboard.blade.php --}}
 <x-app-layout>
   @php
+    // Derniers cours publiés
     $latest = \App\Models\Course::where('is_published', true)
       ->orderByDesc('created_at')->take(6)->get();
 
+    // Compteurs par niveaux
     $easyCount = \App\Models\Course::where('is_published',true)->where('level','debutant')->count();
     $midCount  = \App\Models\Course::where('is_published',true)->where('level','intermediaire')->count();
     $hardCount = \App\Models\Course::where('is_published',true)->where('level','avance')->count();
     $totalCount = $easyCount + $midCount + $hardCount;
 
+    // Leçons
     $lessonsCount = \App\Models\Lesson::count();
 
+    // Cibles de pratique (si la table existe)
     $targetCount = 0;
     try {
       if (\Illuminate\Support\Facades\Schema::hasTable('targets')) {
@@ -18,11 +22,13 @@
       }
     } catch (\Throwable $e) { $targetCount = 0; }
 
+    // Helpers d’apparence (pour les cartes cours)
     $chip = fn($lvl) => $lvl==='debutant' ? 'chip-easy' : ($lvl==='intermediaire' ? 'chip-medium' : 'chip-hard');
     $tone = fn($lvl) => $lvl==='debutant' ? 't-easy' : ($lvl==='intermediaire' ? 't-medium' : 't-hard');
   @endphp
 
   <section class="wh-container">
+    {{-- HERO --}}
     <div class="card hero">
       <p class="muted up mb-2">Dashboard</p>
       <h1 class="hero-title">
@@ -35,6 +41,7 @@
       </div>
     </div>
 
+    {{-- STATS / PASTILLES --}}
     <div class="grid-3 mt-5">
       <div class="wh-card">
         <p class="muted">Leçons</p>
@@ -51,14 +58,23 @@
       <div class="wh-card">
         <p class="muted">Répartition des niveaux</p>
         <div class="mt-3" style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="{{ route('courses.index') }}" class="btn-filter btn-rainbow">Tous <span class="count">{{ $totalCount }}</span></a>
-          <a href="{{ route('courses.index', ['level' => 'easy']) }}" class="btn-filter chip-easy">Facile <span class="count">{{ $easyCount }}</span></a>
-          <a href="{{ route('courses.index', ['level' => 'mid'])  }}" class="btn-filter chip-medium">Moyen <span class="count">{{ $midCount }}</span></a>
-          <a href="{{ route('courses.index', ['level' => 'hard']) }}" class="btn-filter chip-hard">Difficile <span class="count">{{ $hardCount }}</span></a>
+          <a href="{{ route('courses.index') }}" class="btn-filter btn-rainbow">
+            Tous <span class="count">{{ $totalCount }}</span>
+          </a>
+          <a href="{{ route('courses.index', ['level' => 'easy']) }}" class="btn-filter pill-easy">
+            Facile <span class="count">{{ $easyCount }}</span>
+          </a>
+          <a href="{{ route('courses.index', ['level' => 'mid']) }}" class="btn-filter pill-mid">
+            Moyen <span class="count">{{ $midCount }}</span>
+          </a>
+          <a href="{{ route('courses.index', ['level' => 'hard']) }}" class="btn-filter pill-hard">
+            Difficile <span class="count">{{ $hardCount }}</span>
+          </a>
         </div>
       </div>
     </div>
 
+    {{-- NOUVEAUX COURS --}}
     <div class="mt-6">
       <div class="section-head">
         <h2 class="rainbow-title animated-rainbow" style="font-size:1.6rem;margin:0">Nouveaux cours</h2>

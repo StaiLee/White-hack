@@ -2,73 +2,69 @@
 <x-app-layout>
   @php
     $active = request('level'); // '', 'easy', 'mid', 'hard'
-    $map = ['easy'=>'debutant','mid'=>'intermediaire','hard'=>'avance'];
 
-    // Stats pour les filtres
     $countAll  = \App\Models\Course::where('is_published',true)->count();
     $countEasy = \App\Models\Course::where('is_published',true)->where('level','debutant')->count();
     $countMid  = \App\Models\Course::where('is_published',true)->where('level','intermediaire')->count();
     $countHard = \App\Models\Course::where('is_published',true)->where('level','avance')->count();
-
-    // Liste des cours paginés (avec filtre si présent)
-    $courses = \App\Models\Course::where('is_published',true)
-      ->when($active, function($q) use($map,$active){
-        if(isset($map[$active])) $q->where('level', $map[$active]);
-      })
-      ->orderByDesc('created_at')
-      ->paginate(12)
-      ->withQueryString();
   @endphp
 
   <section class="wh-container">
     <div class="card">
-      <div class="section-head">
-        <div>
+      {{-- Conteneur grid: gauche = titre+filtres, droite = search --}}
+      <div class="section-head course-head">
+        <div class="head-left">
           <p class="muted up mb-2">Catalogue</p>
-          <h1 class="rainbow-title animated-rainbow" style="font-size:2.4rem;margin:0">Tous les cours</h1>
+          <h1 class="rainbow-title animated-rainbow" style="margin:0">Tous les cours</h1>
 
           <div class="filters mt-3">
-            <a class="btn-filter btn-rainbow {{ $active==='' ? 'is-active':'' }}" href="{{ route('courses.index') }}">
+            <a href="{{ route('courses.index') }}"
+               class="btn-filter btn-rainbow {{ $active==='' ? 'is-active' : '' }}">
               Tous <span class="count">{{ $countAll }}</span>
             </a>
-            <a class="btn-filter chip-easy {{ $active==='easy' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'easy']) }}">
+
+            <a href="{{ route('courses.index', ['level'=>'easy']) }}"
+               class="btn-filter pill-easy {{ $active==='easy' ? 'is-active' : '' }}">
               Facile <span class="count">{{ $countEasy }}</span>
             </a>
-            <a class="btn-filter chip-medium {{ $active==='mid' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'mid']) }}">
+
+            <a href="{{ route('courses.index', ['level'=>'mid']) }}"
+               class="btn-filter pill-mid {{ $active==='mid' ? 'is-active' : '' }}">
               Moyen <span class="count">{{ $countMid }}</span>
             </a>
-            <a class="btn-filter chip-hard {{ $active==='hard' ? 'is-active':'' }}" href="{{ route('courses.index',['level'=>'hard']) }}">
+
+            <a href="{{ route('courses.index', ['level'=>'hard']) }}"
+               class="btn-filter pill-hard {{ $active==='hard' ? 'is-active' : '' }}">
               Difficile <span class="count">{{ $countHard }}</span>
             </a>
           </div>
         </div>
 
-        <form method="get" class="search-form">
-          <input class="inp" type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher un cours…">
-          @if($active) <input type="hidden" name="level" value="{{ $active }}"> @endif
-          <button class="btn-secondary">Rechercher</button>
+        {{-- Search à DROITE --}}
+        <form class="search-form course-search" method="get" action="{{ route('courses.index') }}">
+          <input class="inp" type="search" name="q" placeholder="Rechercher un cours…" value="{{ request('q') }}">
+          <button class="btn-secondary" type="submit">Rechercher</button>
         </form>
       </div>
     </div>
 
-    <div class="courses-grid mt-5">
+    <div class="courses-grid mt-4">
       @foreach($courses as $c)
+        @php
+          $tone = $c->level === 'debutant' ? 't-easy' : ($c->level === 'intermediaire' ? 't-medium' : 't-hard');
+          $chip = $c->level === 'debutant' ? 'chip-easy' : ($c->level === 'intermediaire' ? 'chip-medium' : 'chip-hard');
+        @endphp
+
         <article class="course-card">
           <div class="course-card__bg"></div>
           <div class="course-card__hover"></div>
 
-          <div class="course-card__badge {{ $c->level==='debutant' ? 'chip-easy' : ($c->level==='intermediaire' ? 'chip-medium' : 'chip-hard') }}">
+          <div class="course-card__badge {{ $chip }}">
             {{ ucfirst($c->level) }} • ~{{ $c->duration_min }} min
           </div>
 
-          <h3 class="course-card__title
-            {{ $c->level==='debutant' ? 't-easy' : ($c->level==='intermediaire' ? 't-medium' : 't-hard') }}">
-            {{ $c->title }}
-          </h3>
-
-          <p class="course-card__desc">
-            {{ $c->description }}
-          </p>
+          <h3 class="course-card__title {{ $tone }}">{{ $c->title }}</h3>
+          <p class="course-card__desc">{{ $c->description }}</p>
 
           <div class="course-card__footer">
             <a href="{{ route('courses.show',$c->slug) }}" class="btn-primary">Ouvrir le cours →</a>
@@ -77,9 +73,10 @@
       @endforeach
     </div>
 
-    {{-- Pagination stylée --}}
-    <div class="pagination">
-      {{ $courses->onEachSide(1)->links() }}
-    </div>
+    @if(method_exists($courses,'links'))
+      <div class="pagination mt-4">
+        {{ $courses->links() }}
+      </div>
+    @endif
   </section>
 </x-app-layout>

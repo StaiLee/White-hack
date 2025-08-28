@@ -121,14 +121,231 @@ body.wh-body::before{
 .btn-filter.is-active{box-shadow:0 0 0 2px rgba(255,255,255,.18),0 8px 20px rgba(0,0,0,.35)}
 .btn-rainbow{background:linear-gradient(90deg,#23d5ab,#23a6d5,#23d5ab,#e7d84b,#ee7752,#e73c7e,#23d5ab);background-size:400% 100%;animation:shine 8s linear infinite;color:#0b1020;border-color:transparent}
 
-/* Dégradé ANIMÉ forcé pour pastilles niveau (assure la couleur) */
+/* Dégradé ANIMÉ forcé si des filtres utilisent encore chip-* */
 .btn-filter.chip-easy{background-image:linear-gradient(90deg,var(--easy1),var(--easy2)) !important;background-size:200% 100%;animation:gradeLoop 6s linear infinite;color:#05251b;border-color:transparent;box-shadow:0 8px 22px rgba(46,210,150,.25), inset 0 0 0 1px rgba(255,255,255,.08)}
 .btn-filter.chip-medium{background-image:linear-gradient(90deg,var(--mid1),var(--mid2)) !important;background-size:200% 100%;animation:gradeLoop 6s linear infinite;color:#2d1400;border-color:transparent;box-shadow:0 8px 22px rgba(255,173,66,.25), inset 0 0 0 1px rgba(255,255,255,.08)}
 .btn-filter.chip-hard{background-image:linear-gradient(90deg,var(--hard1),var(--hard2)) !important;background-size:200% 100%;animation:gradeLoop 6s linear infinite;color:#32020e;border-color:transparent;box-shadow:0 8px 22px rgba(255,80,110,.25), inset 0 0 0 1px rgba(255,255,255,.08)}
 @keyframes gradeLoop{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* === PASTILLES DE DIFFICULTÉ (FORCÉES & ANIMÉES) ====================== */
+.pill-easy,
+.pill-mid,
+.pill-hard{
+  border-color: transparent !important;
+  background-size: 220% 100% !important;
+  animation: pillLoop 6s linear infinite;
+  box-shadow: 0 10px 22px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.pill-easy{
+  background-image: linear-gradient(90deg, var(--easy1), var(--easy2)) !important;
+  color: #041b12 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.12);
+}
+.pill-mid{
+  background-image: linear-gradient(90deg, var(--mid1), var(--mid2)) !important;
+  color: #2d1400 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.10);
+}
+.pill-hard{
+  background-image: linear-gradient(90deg, var(--hard1), var(--hard2)) !important;
+  color: #32020e !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.10);
+}
+@keyframes pillLoop{
+  0%{background-position:0% 50%}
+  100%{background-position:220% 50%}
+}
 
 /* PAGINATION */
 .pagination{display:flex;gap:10px;align-items:center;margin-top:22px}
 .pagination a,.pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:40px;padding:0 .9rem;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e8f2ff;text-decoration:none;font-weight:800}
 .pagination a:hover{background:rgba(255,255,255,.09)}
 .pagination .active span{background:linear-gradient(90deg,var(--brand1),var(--brand2));color:#06121b;border-color:transparent}
+
+
+/* ====== Mise en page entête catalogue (évite chevauchement) ====== */
+.course-head{
+  align-items: flex-start;         /* aligne le haut */
+  gap: 18px;
+  flex-wrap: wrap;                 /* passe en pile sur mobile */
+}
+.course-head .head-left{
+  flex: 1 1 720px;                 /* gros bloc à gauche */
+  min-width: 640px;                /* garantit la place des pastilles */
+}
+.course-head .search-form{
+  flex: 0 0 420px;                 /* bloc fixe à droite */
+  margin-left: auto;               /* pousse complètement à droite */
+  align-self: flex-start;
+}
+
+/* Responsive : la search passe en dessous proprement */
+@media (max-width: 1100px){
+  .course-head .head-left{
+    flex-basis: 100%;
+    min-width: 100%;
+  }
+  .course-head .search-form{
+    flex-basis: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+    justify-content: flex-start;
+  }
+}
+
+
+/* ===== Entête catalogue : grille 2 colonnes ===== */
+.course-head{
+  display: grid;
+  grid-template-columns: 1fr minmax(360px, 460px); /* gauche flexible, droite fixe */
+  column-gap: 24px;
+  align-items: start;
+}
+
+.course-head .head-left{ min-width: 0; } /* évite les débordements */
+.course-head .course-search{
+  justify-self: end;        /* colle à droite */
+  align-self: start;
+  display: flex;
+  gap: 10px;
+}
+.course-head .course-search .inp{ width: 100%; }
+
+/* Responsive : la barre passe dessous, pleine largeur */
+@media (max-width: 1100px){
+  .course-head{
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+  }
+  .course-head .course-search{
+    justify-self: start;
+    width: 100%;
+  }
+  .course-head .course-search .inp{ flex:1 1 auto; }
+}
+
+/* ===== Leçons / Notions : grille & liens ===== */
+.lesson-cols{
+  display:grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap:18px;
+}
+@media (max-width: 980px){
+  .lesson-cols{ grid-template-columns: 1fr; }
+}
+
+/* Corps de leçon : typographie et liens */
+.lesson-body{
+  line-height:1.7;
+  font-size:1.02rem;
+}
+.lesson-body a,
+.road-link{
+  color:#d6eeff;
+  text-decoration:none;
+  border-bottom:1px dashed rgba(214,238,255,.35);
+  transition: color .15s ease, border-color .15s ease, text-shadow .15s ease;
+}
+.lesson-body a:hover,
+.road-link:hover{
+  color:#ffffff;
+  border-color:transparent;
+  text-shadow:0 0 10px rgba(120,220,255,.45);
+}
+
+/* Liste “notions” / “dans ce module” */
+.road-lessons{
+  list-style:none;
+  padding:0;
+  margin:.25rem 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.road-lessons li{
+  position:relative;
+  padding-left:18px;
+}
+.road-lessons li::before{
+  content:"";
+  position:absolute; left:0; top:.7em;
+  width:8px; height:8px; border-radius:999px;
+  background: linear-gradient(90deg,#71dfff,#f6a);
+  box-shadow: 0 0 10px rgba(120,220,255,.35);
+}
+
+/* Lien actif dans la navigation de module */
+.road-link.is-active{
+  color:#fff;
+  font-weight:900;
+  border-bottom-color: transparent;
+}
+
+/* Petit lien doux réutilisable */
+.link-soft{
+  color:#cfe9ff; text-decoration:none; border-bottom:1px dashed rgba(207,233,255,.35);
+}
+.link-soft:hover{ color:#fff; border-bottom-color:transparent }
+
+
+/* ===== Markdown (leçons) ===== */
+.md{
+  line-height:1.75;
+  font-size:1.06rem;
+  color:#eaf2ff;
+}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{
+  margin:1.1rem 0 .55rem;
+  font-weight:900;
+  line-height:1.25;
+}
+.md h1{font-size:2rem}
+.md h2{font-size:1.6rem}
+.md h3{font-size:1.35rem}
+.md h4{font-size:1.15rem}
+
+.md h2,.md h3{
+  background:linear-gradient(90deg,#7ee8fa,#80ffea,#a0ff8f,#ffe066);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 18px rgba(0,0,0,.25);
+}
+.md p{margin:.5rem 0 1rem}
+
+.md ul,.md ol{margin:.5rem 0 1rem 1.2rem;padding-left:0}
+.md ul>li,.md ol>li{margin:.35rem 0}
+.md ul>li{list-style:none;position:relative;padding-left:1rem}
+.md ul>li::before{
+  content:"";position:absolute;left:0;top:.63em;width:7px;height:7px;border-radius:999px;
+  background:linear-gradient(90deg,#71dfff,#f6a);
+  box-shadow:0 0 8px rgba(120,220,255,.45);
+}
+
+.md code{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  padding:.12rem .35rem;border-radius:6px;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+}
+.md pre{
+  background:rgba(7,12,22,.9);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:.9rem 1rem;overflow:auto;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  margin:1rem 0;
+}
+.md pre code{background:transparent;border:none;padding:0;white-space:pre}
+
+.md blockquote{
+  margin:1rem 0;padding:.75rem 1rem;border-left:4px solid #29abe2;
+  background:rgba(41,171,226,.08);border-radius:10px;color:#d8ecff;
+}
+
+.md hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:1.5rem 0}
+
+.md a{color:#bfe3ff;text-decoration:underline;text-decoration-color:rgba(191,227,255,.45)}
+.md a:hover{color:#fff;text-decoration-color:#fff}
+
+.md table{width:100%;border-collapse:collapse;margin:1rem 0}
+.md th,.md td{border:1px solid rgba(255,255,255,.12);padding:.5rem .65rem}
+.md th{background:rgba(255,255,255,.06)}
+
