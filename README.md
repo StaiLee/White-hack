@@ -1,3 +1,13 @@
+<p align="center">
+  <img src="./assets/banner.svg" alt="White-hack" width="100%"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/StaiLee/White-hack?style=for-the-badge&color=ff4d5e&logoColor=white" alt="badge"/>
+  <img src="https://img.shields.io/github/license/StaiLee/White-hack?style=for-the-badge&color=684A95&label=LICENSE" alt="badge"/>
+  <img src="https://img.shields.io/github/stars/StaiLee/White-hack?style=for-the-badge&logo=github&color=e3b341&label=STARS" alt="badge"/>
+</p>
+
 # WhiteHack — Dossier & Plateforme pédagogique (RNCP 36061, N6)
 
 **Projet** : WhiteHack — plateforme pédagogique pour l’apprentissage de la cybersécurité (cours, labs vulnérables, CTF).  
