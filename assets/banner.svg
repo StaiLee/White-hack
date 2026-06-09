@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 260" width="1200" height="260" font-family="ui-monospace,'Courier New',monospace">
+  <defs><linearGradient id="wg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ff4d5e"/></linearGradient>
+    <linearGradient id="bd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8e8e8"/><stop offset="100%" stop-color="#ff4d5e"/></linearGradient>
+  </defs>
+  <rect width="1200" height="260" rx="16" fill="#0c0e11"/>
+  <rect x="1.5" y="1.5" width="1197" height="257" rx="15" fill="none" stroke="url(#bd)" stroke-width="2"/>
+  <g><path d="M1090 64 L1146 86 V132 C1146 168 1120 190 1090 200 C1060 190 1034 168 1034 132 V86 Z" fill="#15191e" stroke="#ff4d5e" stroke-width="3"/>
+  <path d="M1066 130 l16 16 30 -34" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+  
+  <text x="82" y="140" font-size="58" font-weight="700" fill="url(#wg)" letter-spacing="1">WHITE-HACK</text>
+  <text x="84" y="178" font-size="22" font-weight="600" fill="#e8e8e8">Web Security Thesis</text>
+  <text x="84" y="208" font-size="15" fill="#ff8e98">&#8227; Laravel &#183; ethical-hacking concepts &#183; B3 project</text>
+</svg>
